@@ -8,7 +8,7 @@ while true; do
         2 "🖥 Funcionalidades de red"  \
         3 "🔥 Firewall" \
         4 "❌ Salir" \
-        --width=500 --height=300)
+        --width=400 --height=400)
 
     case $opcion in
         1) ./Administracion_usuarios.sh ;;
