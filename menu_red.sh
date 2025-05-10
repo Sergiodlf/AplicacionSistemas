@@ -8,7 +8,7 @@ while true; do
         2 "Medir velocidad de red" \
         3 "Verificar conectividad a Internet" \
         4 "Salir" \
-        --width=400 --height=300)
+        --width=400 --height=400)
 
     case $opcion in
         1)
