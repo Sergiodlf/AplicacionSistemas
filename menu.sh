@@ -13,7 +13,8 @@ while true; do
     case $opcion in
         1) ./Administracion_usuarios.sh ;;
         2) ./menu_red.sh ;;
-        3) ./Firewall.sh ;;
+        3) ./firewall.sh ;;
+        4) ./enviar_formulario_correo.sh ;;
         *) exit 0 ;;
     esac
 done
