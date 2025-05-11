@@ -7,7 +7,8 @@ while true; do
         1 "👥 Administracion de usuarios" \
         2 "🖥 Funcionalidades de red"  \
         3 "🔥 Firewall" \
-        4 "❌ Salir" \
+        4 "📧 Enviar Correo" \
+        5 "❌ Salir" \
         --width=400 --height=400)
 
     case $opcion in
