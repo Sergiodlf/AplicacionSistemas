@@ -16,7 +16,6 @@ while true; do
         2) ./menu_red.sh ;;
         3) ./firewall.sh ;;
         4) ./enviar_formulario_correo.sh ;;
-        5) ./gestion_usuarios.sh ;;
         *) exit 0 ;;
     esac
 done
