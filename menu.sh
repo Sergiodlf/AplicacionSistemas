@@ -8,12 +8,11 @@ while true; do
         2 "🖥 Funcionalidades de red"  \
         3 "🔥 Firewall" \
         4 "📧 Enviar Correo" \
-        5 "👤 Gestion de usuarios" \
-        6 "❌ Salir" \
+        5 "❌ Salir" \
         --width=400 --height=400)
 
     case $opcion in
-        1) ./Administracion_usuarios.sh ;;
+        1) ./gestion_usuarios.sh ;;
         2) ./menu_red.sh ;;
         3) ./firewall.sh ;;
         4) ./enviar_formulario_correo.sh ;;
