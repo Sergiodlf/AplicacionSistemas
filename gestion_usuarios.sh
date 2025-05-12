@@ -1,55 +1,59 @@
 #!/bin/bash
 
-# Verificar si el script se ejecuta como root
-if [[ $EUID -ne 0 ]]; then
-  zenity --error --center --text="Este script debe ejecutarse como root."
-  exit 1
-fi
+# Función para ejecutar comandos con sudo sin perder el entorno gráfico
+sudo_exec() {
+  sudo env "DISPLAY=$DISPLAY" "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" "$@"
+}
 
-function crear_usuario() {
-  username=$(zenity --entry --center --title="Crear Usuario" --text="Nombre del nuevo usuario:")
+crear_usuario() {
+  username=$(zenity --entry --title="Crear Usuario" --text="Nombre del nuevo usuario:")
   [[ -z "$username" ]] && return
 
   if id "$username" &>/dev/null; then
-    zenity --error --center --text="El usuario ya existe."
+    zenity --error --text="El usuario ya existe."
     return
   fi
 
-  password=$(zenity --password --center --title="Contraseña para $username")
+  password=$(zenity --password --title="Contraseña para $username")
   [[ -z "$password" ]] && return
 
-  useradd -m "$username"
-  echo "$username:$password" | chpasswd
-  zenity --info --center --text="Usuario $username creado correctamente."
-}
+  sudo_exec useradd -m "$username"
+  echo "$username:$password" | sudo_exec chpasswd
 
-function eliminar_usuario() {
-  username=$(zenity --entry --center --title="Eliminar Usuario" --text="Nombre del usuario a eliminar:")
-  [[ -z "$username" ]] && return
-
-  if id "$username" &>/dev/null; then
-    zenity --question --center --title="Eliminar Home" --text="¿Eliminar también el directorio home del usuario?" --ok-label="Sí" --cancel-label="No"
-    if [[ $? -eq 0 ]]; then
-      userdel -r "$username"
-    else
-      userdel "$username"
-    fi
-    zenity --info --center --text="Usuario $username eliminado."
+  if [[ $? -eq 0 ]]; then
+    zenity --info --text="Usuario $username creado correctamente."
   else
-    zenity --error --center --text="El usuario no existe."
+    zenity --error --text="Error al crear el usuario."
   fi
 }
 
-function editar_usuario() {
-  username=$(zenity --entry --center --title="Editar Usuario" --text="Nombre del usuario a editar:")
+eliminar_usuario() {
+  username=$(zenity --entry --title="Eliminar Usuario" --text="Nombre del usuario a eliminar:")
+  [[ -z "$username" ]] && return
+
+  if id "$username" &>/dev/null; then
+    zenity --question --text="¿Eliminar también el directorio home?"
+    if [[ $? -eq 0 ]]; then
+      sudo_exec userdel -r "$username"
+    else
+      sudo_exec userdel "$username"
+    fi
+    zenity --info --text="Usuario $username eliminado."
+  else
+    zenity --error --text="El usuario no existe."
+  fi
+}
+
+editar_usuario() {
+  username=$(zenity --entry --title="Editar Usuario" --text="Nombre del usuario a editar:")
   [[ -z "$username" ]] && return
 
   if ! id "$username" &>/dev/null; then
-    zenity --error --center --text="El usuario no existe."
+    zenity --error --text="El usuario no existe."
     return
   fi
 
-  opcion=$(zenity --list --center --title="Editar Usuario" --text="¿Qué deseas editar?" \
+  opcion=$(zenity --list --title="Editar Usuario" --text="¿Qué deseas editar?" \
     --column="Opción" --column="Acción" \
     1 "Cambiar nombre de usuario" \
     2 "Cambiar contraseña" \
@@ -57,17 +61,17 @@ function editar_usuario() {
 
   case $opcion in
     1)
-      nuevo_nombre=$(zenity --entry --center --title="Nuevo Nombre" --text="Introduce el nuevo nombre de usuario:")
+      nuevo_nombre=$(zenity --entry --title="Nuevo Nombre" --text="Introduce el nuevo nombre de usuario:")
       [[ -z "$nuevo_nombre" ]] && return
-      usermod -l "$nuevo_nombre" "$username"
-      usermod -d "/home/$nuevo_nombre" -m "$nuevo_nombre"
-      zenity --info --center --text="Nombre de usuario cambiado a $nuevo_nombre."
+      sudo_exec usermod -l "$nuevo_nombre" "$username"
+      sudo_exec usermod -d "/home/$nuevo_nombre" -m "$nuevo_nombre"
+      zenity --info --text="Nombre de usuario cambiado a $nuevo_nombre."
       ;;
     2)
-      nueva_pass=$(zenity --password --center --title="Nueva Contraseña")
+      nueva_pass=$(zenity --password --title="Nueva Contraseña")
       [[ -z "$nueva_pass" ]] && return
-      echo "$username:$nueva_pass" | chpasswd
-      zenity --info --center --text="Contraseña cambiada correctamente."
+      echo "$username:$nueva_pass" | sudo_exec chpasswd
+      zenity --info --text="Contraseña cambiada correctamente."
       ;;
     *)
       return
@@ -75,14 +79,14 @@ function editar_usuario() {
   esac
 }
 
-function listar_usuarios() {
+listar_usuarios() {
   usuarios=$(cut -d: -f1 /etc/passwd | sort)
-  zenity --text-info --center --title="Lista de Usuarios" --width=400 --height=400 --filename=<(echo "$usuarios")
+  zenity --text-info --title="Lista de Usuarios" --width=400 --height=400 --filename=<(echo "$usuarios")
 }
 
 # Menú principal
 while true; do
-  opcion=$(zenity --list --center --title="Gestión de Usuarios" \
+  opcion=$(zenity --list --title="Gestión de Usuarios" \
     --text="Seleccione una opción:" \
     --column="Acción" \
     "Crear Usuario" "Eliminar Usuario" "Editar Usuario" "Listar Usuarios" "Salir" \
