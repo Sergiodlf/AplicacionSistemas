@@ -34,6 +34,7 @@ firewall.sh: Gestión de reglas de firewall.
 menu_red.sh: Opciones relacionadas con la configuración de red.
 enviar_formulario_correo.sh: Envío de formularios por email.
 sendmail.py: Cliente de correo en Python para uso desde Bash.
+backup.sh: Permite crear una copia comprimida de una carpeta específica en tu sistema WSL.
 
 📌 Requisitos
 Bash
