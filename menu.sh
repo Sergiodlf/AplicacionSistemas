@@ -8,7 +8,8 @@ while true; do
         2 "🖥 Funcionalidades de red"  \
         3 "🔥 Firewall" \
         4 "📧 Enviar Correo" \
-        5 "❌ Salir" \
+        5 "Backup" \
+        6 "❌ Salir" \
         --width=400 --height=400)
 
     case $opcion in
@@ -16,6 +17,7 @@ while true; do
         2) ./menu_red.sh ;;
         3) ./firewall.sh ;;
         4) ./enviar_formulario_correo.sh ;;
+        5) ./backup.sh ;;
         *) exit 0 ;;
     esac
 done
